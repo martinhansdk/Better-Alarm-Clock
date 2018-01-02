@@ -1,0 +1,27 @@
+RAGEL := ../ragel/ragel.exe
+
+RAGEL_MACHINE := AlarmParser
+RAGEL_DIR     := Src/time
+RAGEL_INPUT   := ../$(RAGEL_DIR)/$(RAGEL_MACHINE).rl
+RAGEL_OUTPUT  := $(RAGEL_DIR)/$(RAGEL_MACHINE).cpp
+RAGEL_OBJ     := $(RAGEL_DIR)/$(RAGEL_MACHINE).o
+RAGEL_DEP     := $(RAGEL_DIR)/$(RAGEL_MACHINE).d
+
+$(RAGEL_OUTPUT): $(RAGEL_INPUT)
+	$(RAGEL) -C -o $@ $<
+	
+# Each subdirectory must supply rules for building sources it contributes
+$(RAGEL_OBJ): $(RAGEL_OUTPUT)
+	@echo 'Building file: $<'
+	@echo 'Invoking: MCU G++ Compiler'
+	@echo $(PWD)
+	arm-none-eabi-g++ -mcpu=cortex-m0plus -mthumb -mfloat-abi=soft -I"../date/include" -I"../$(RAGEL_DIR)" -O3 -g3 -Wall -fmessage-length=0 -ffunction-sections -c -fno-exceptions -fno-rtti -MMD -MP -MF"$(@:%.o=%.d)" -MT"$@" -o "$@" "$<"
+	@echo 'Finished building: $<'
+	@echo ' '
+
+USER_OBJS += \
+$(RAGEL_OBJ)
+
+$(info RAGEL_OUTPUT is [${RAGEL_OUTPUT}]) 
+$(info RAGEL_OBJ is [${RAGEL_OBJ}])
+$(info PWD is [${PWD}])
