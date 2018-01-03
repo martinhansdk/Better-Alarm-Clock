@@ -7960,7 +7960,7 @@ struct make_string<char, Traits>
         return std::basic_string<char, Traits>(s.begin(), s.end());
     }
 };
-
+/* removed due to MingW bug
 template <>
 struct make_string<wchar_t>
 {
@@ -7985,7 +7985,7 @@ struct make_string<wchar_t, Traits>
         return std::basic_string<wchar_t, Traits>(s.begin(), s.end());
     }
 };
-
+*/
 }  // namespace detail
 
 template <class CharT, class Traits, class Rep, class Period>

@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include "AlarmParser.h"
 
-%%{
+%%{ 
 	machine atoi;
 	write data;
 }%%
@@ -41,7 +41,7 @@ long long alarmAtoi(const char *str )
 		val = -1 * val;
 
 	if ( cs < atoi_first_final )
-		fprintf( stderr, "atoi: there was an error\n" );
+		fprintf( stderr, "alarmAtoi: there was an error\n" );
 
 	return val;
 };
