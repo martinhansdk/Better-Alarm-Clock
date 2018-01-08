@@ -4,41 +4,56 @@
  *  Created on: Dec 30, 2017
  *      Author: Hans
  */
+#include <sstream>
 
-#include <experimental/optional>
-#include "date/date.h"
-#include "AlarmParser.h"
+#include "AlarmClock.h"
 
-using namespace date;
-using namespace std::chrono;
-using namespace std::experimental;
+const char * const wdnames[] = {"sun", "mon", "tue", "wed", "thu", "fri", "sat" };
 
-using time_point_t = std::chrono::time_point<std::chrono::system_clock, std::chrono::seconds>;
-using date_t = std::chrono::time_point<std::chrono::system_clock, std::chrono::seconds>;
+Alarm::Alarm() {
+  weekdays = ALL_WEEKDAYS;
+  no_exceptions = 0;
+}
 
-using alarm_time_t = time_of_day<std::chrono::minutes>;
-
-
-class AlarmException {
-  date_t date;
-  optional<alarm_time_t> replacement_time; // if no replacement time is present, the exception says skip
-
-public:
-  bool skip() const {
-    return !replacement_time;
+void Alarm::addException(const AlarmException& e) {
+  if(no_exceptions < EXCEPTIONS) {
+      exceptions[no_exceptions++] = e;
   }
-};
+}
 
-class Alarm {
-  alarm_time_t time;
-  bool weekdays[7];
-  date_t first_day;
-  optional<date_t> last_day;
-  optional<AlarmException> exceptions[10];
+std::string Alarm::toString() const {
+  std::stringstream ss;
+  ss << "alarm " << time;
 
-  optional<time_point_t> nextOccurrence(time_point_t t);
-};
+  if(weekdays != ALL_WEEKDAYS) {
+    // we have missing weekdays! So print the full list
+      ss << " every ";
+      bool first=true;
+      for(int j=0 ; j<7 ; j++) {
+	  if(weekdays & (1<<j)) {
+	      if(!first) ss << " ";
+	      first = false;
+	      ss << wdnames[j];
+	  }
+      }
+  }
 
+  if(first_day) ss << " from " << year_month_day{floor<days>(first_day.value())};
+  if(last_day) ss << " until " << year_month_day{floor<days>(last_day.value())};
+
+  for(int i=0 ; i < no_exceptions ; i++) {
+      ss << " but on " << year_month_day{floor<days>(exceptions[i].date())};
+      if(exceptions[i].skip()) {
+	  ss << " skip";
+      } else {
+	  ss << " " << exceptions[i].time().value();
+      }
+
+  }
+
+  ss << ";";
+  return ss.str();
+}
 
 //Simple population of the exclusion set
 bool isNear(time_point_t t, time_point_t now)
@@ -57,7 +72,7 @@ extern "C"
   {
     auto day = sys_days(2002_y/jan/10);
 
-    secs += alarmAtoi("15");
+
 
     time_point_t now = day + 1h+2min+seconds(secs);
     time_point_t alarm = day + 1h+2min+10s;

@@ -8,6 +8,8 @@
 #ifndef TIME_ALARMPARSER_H_
 #define TIME_ALARMPARSER_H_
 
-extern long long alarmAtoi(const char *str );
+#include "AlarmClock.h"
+
+extern Alarm parseAlarm(const char *str );
 
 #endif /* TIME_ALARMPARSER_H_ */

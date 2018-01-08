@@ -8,17 +8,20 @@
 #include "catch.hpp"
 #include "AlarmParser.h"
 
-unsigned int Factorial( unsigned int number ) {
-    return number <= 1 ? number : Factorial(number-1)*number;
-}
+TEST_CASE( "Alarm is parsed", "[parsealarm]") {
 
-TEST_CASE( "Factorials are computed", "[factorial]" ) {
-    REQUIRE( Factorial(1) == 1 );
-    REQUIRE( Factorial(2) == 2 );
-    REQUIRE( Factorial(3) == 6 );
-    REQUIRE( Factorial(10) == 3628800 );
-}
+#define TEST_PARSE_EQUALS_PRINT(s) REQUIRE( parseAlarm(s).toString() == s);
+#define TEST_PARSE_EQUALS(s, r) REQUIRE( parseAlarm(s).toString() == r);
 
-TEST_CASE( "Int is parsed", "[parseint]") {
-  REQUIRE( alarmAtoi("6") == 6) ;
+  TEST_PARSE_EQUALS_PRINT("alarm 06:15;");
+  TEST_PARSE_EQUALS("alarm 06:15 every sun mon tue wed thu fri sat;", "alarm 06:15;");
+  TEST_PARSE_EQUALS_PRINT("alarm 06:15 every sun mon tue wed thu fri;");
+  TEST_PARSE_EQUALS_PRINT("alarm 06:15 every wed;");
+  TEST_PARSE_EQUALS("alarm 06:15 every sun mon wed sun tue thu wed sun fri;", "alarm 06:15 every sun mon tue wed thu fri;");
+  TEST_PARSE_EQUALS_PRINT("alarm 06:15 from 2018-05-26;");
+  TEST_PARSE_EQUALS_PRINT("alarm 06:15 until 2018-05-30;");
+  TEST_PARSE_EQUALS_PRINT("alarm 06:15 but on 2018-05-10 skip but on 2018-05-11 06:30;");
+//  TEST_PARSE_EQUALS_PRINT("alarm 15:00 except on \"prod days\" skip;");
+//  TEST_PARSE_EQUALS_PRINT("alarm 16:00 on \"prod days\";");
+
 }
