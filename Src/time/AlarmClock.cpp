@@ -21,6 +21,15 @@ void Alarm::addException(const AlarmException& e) {
   }
 }
 
+optional<time_point_t> nextOccurrence(time_point_t t) const {
+  t += 1s; // advance to next instant after t
+  // find first time point at or after t with
+  auto date = date::floor<date::days>(t);
+  auto time = date::make_time(t - date);
+
+
+}
+
 std::string Alarm::toString() const {
   std::stringstream ss;
   ss << "alarm " << time;

@@ -25,3 +25,20 @@ TEST_CASE( "Alarm is parsed", "[parsealarm]") {
 //  TEST_PARSE_EQUALS_PRINT("alarm 16:00 on \"prod days\";");
 
 }
+
+
+TEST_CASE("Alarm finds next time", "[alarm]") {
+  time_point_t t = sys_days(2018_y/1/1); // a Monday, at midnight
+
+  SECTION("for a daily alarm") {
+    Alarm alarm = parseAlarm("alarm 06:15;");
+
+    auto n=alarm.nextOccurrence(t);
+    auto exp=t+6h+15min;
+    REQUIRE(n == exp);
+    for (int i=0; i<15; ++i) {
+
+    }
+
+  }
+}
