@@ -1,4 +1,8 @@
-RAGEL := ../ragel/ragel.exe
+ifeq ($(OS),Windows_NT)
+	RAGEL := ../ragel/ragel.exe
+else
+	RAGEL := ragel
+endif
 
 RAGEL_MACHINE := AlarmParser
 RAGEL_DIR     := Src/time

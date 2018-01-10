@@ -6,9 +6,44 @@
  */
 
 #include "catch.hpp"
+#include "date/date.h"
 #include "AlarmParser.h"
 
-TEST_CASE( "Alarm is parsed", "[parsealarm]") {
+using namespace date;
+
+namespace Catch {
+
+  std::string toString(time_point_t const &value) {
+    using namespace date;
+    using namespace std::chrono;
+
+    auto today = date::floor<days>(value);
+
+    std::stringstream ss;
+    ss << year_month_day(today) << ' ' << date::make_time(value - today) << " UTC";
+    return ss.str();
+  }
+
+  template<>
+  struct StringMaker<time_point_t> {
+    static std::string convert( time_point_t const& value ) {
+      return toString(value);
+    }
+  };
+
+  template<>
+  struct StringMaker<optional<time_point_t>> {
+    static std::string convert( optional<time_point_t> const& value ) {
+      if(value)
+	return toString(value.value());
+      else
+	return "empty";
+    }
+  };
+
+}
+
+TEST_CASE( "Alarm is parsed", "[alarm,io]") {
 
 #define TEST_PARSE_EQUALS_PRINT(s) REQUIRE( parseAlarm(s).toString() == s);
 #define TEST_PARSE_EQUALS(s, r) REQUIRE( parseAlarm(s).toString() == r);
@@ -34,10 +69,12 @@ TEST_CASE("Alarm finds next time", "[alarm]") {
     Alarm alarm = parseAlarm("alarm 06:15;");
 
     auto n=alarm.nextOccurrence(t);
-    auto exp=t+6h+15min;
-    REQUIRE(n == exp);
+    time_point_t exp=t+6h+15min;
+    REQUIRE(n == t);
     for (int i=0; i<15; ++i) {
-
+	exp+=24h;
+	n=alarm.nextOccurrence(n.value());
+	REQUIRE(n == exp);
     }
 
   }

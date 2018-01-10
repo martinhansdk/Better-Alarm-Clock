@@ -10,7 +10,7 @@
 
 
 %%{ 
-	machine atoi;
+	machine alarm;
 	write data;
 }%%
 

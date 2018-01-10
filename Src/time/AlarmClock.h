@@ -7,7 +7,7 @@
 #define EXTERNC
 #endif
 
-#define ONLY_C_LOCALE 1
+//#define ONLY_C_LOCALE 1
 
 #include <array>
 #include <experimental/optional>
