@@ -13,7 +13,7 @@ using namespace date;
 
 namespace Catch {
 
-  std::string toString(time_point_t const &value) {
+  std::string toString(time_point_secs_t const &value) {
     using namespace date;
     using namespace std::chrono;
 
@@ -25,15 +25,15 @@ namespace Catch {
   }
 
   template<>
-  struct StringMaker<time_point_t> {
-    static std::string convert( time_point_t const& value ) {
+  struct StringMaker<time_point_secs_t> {
+    static std::string convert( time_point_secs_t const& value ) {
       return toString(value);
     }
   };
 
   template<>
-  struct StringMaker<optional<time_point_t>> {
-    static std::string convert( optional<time_point_t> const& value ) {
+  struct StringMaker<optional<time_point_secs_t>> {
+    static std::string convert( optional<time_point_secs_t> const& value ) {
       if(value)
 	return toString(value.value());
       else
@@ -61,21 +61,51 @@ TEST_CASE( "Alarm is parsed", "[alarm,io]") {
 
 }
 
+#define SET_START_TIME_AND_ALARM(start_day, start_time, alarm_string)         \
+		time_point_secs_t t = sys_days(start_day) + start_time; \
+		Alarm alarm = parseAlarm(alarm_string);
+
+
+#define SET_START_DAY_AND_ALARM(start_day, alarm_string)    SET_START_TIME_AND_ALARM(start_day, 0h, alarm_string)
+
+#define CHECK_FIRST_OCCURRENCE(from_midnight)        \
+		auto n=alarm.nextOccurrence(t);      \
+		time_point_secs_t midnight = floor<days>(t); \
+		time_point_secs_t exp=midnight+from_midnight;    \
+		CHECK(n == exp);
+
+#define CHECK_NEXT_OCCURRENCE_DIST(gap) \
+		exp+=gap; \
+		n=alarm.nextOccurrence(n.value()); \
+		CHECK(n == exp);
 
 TEST_CASE("Alarm finds next time", "[alarm]") {
-  time_point_t t = sys_days(2018_y/1/1); // a Monday, at midnight
 
   SECTION("for a daily alarm") {
-    Alarm alarm = parseAlarm("alarm 06:15;");
+    SET_START_DAY_AND_ALARM(2018_y/1/1, "alarm 06:15;");
 
-    auto n=alarm.nextOccurrence(t);
-    time_point_t exp=t+6h+15min;
-    REQUIRE(n == t);
+    CHECK_FIRST_OCCURRENCE(6h+15min);
     for (int i=0; i<15; ++i) {
-	exp+=24h;
-	n=alarm.nextOccurrence(n.value());
-	REQUIRE(n == exp);
+	CHECK_NEXT_OCCURRENCE_DIST(24h);
     }
-
   }
+
+  SECTION("for a daily alarm, starting right after alarm triggered") {
+    SET_START_TIME_AND_ALARM(2018_y/1/1, 6h + 16min, "alarm 06:15;");
+
+    CHECK_FIRST_OCCURRENCE(24h+6h+15min);
+    for (int i=0; i<15; ++i) {
+	CHECK_NEXT_OCCURRENCE_DIST(24h);
+    }
+  }
+
+  SECTION("for a weekly alarm") {
+    SET_START_DAY_AND_ALARM(2018_y/1/1, "alarm 06:15 every wed;");
+
+    CHECK_FIRST_OCCURRENCE(48h+6h+15min);
+    for (int i=0; i<15; ++i) {
+	CHECK_NEXT_OCCURRENCE_DIST(7*24h);
+    }
+  }
+
 }

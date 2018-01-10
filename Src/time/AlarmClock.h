@@ -19,20 +19,19 @@ using namespace date;
 using namespace std::chrono;
 using namespace std::experimental;
 
-using time_point_t = std::chrono::time_point<std::chrono::system_clock, std::chrono::seconds>;
-using date_t = std::chrono::time_point<std::chrono::system_clock, std::chrono::seconds>;
+using time_point_secs_t = std::chrono::time_point<std::chrono::system_clock, std::chrono::seconds>;
+using date_t = sys_days;
 
-using alarm_time_t = time_of_day<std::chrono::minutes>;
-
+using time_of_day_minutes_t = time_of_day<std::chrono::minutes>;
 
 class AlarmException {
   date_t _date;
-  optional<alarm_time_t> replacement_time; // if no replacement time is present, the exception says skip
+  optional<time_of_day_minutes_t> replacement_time; // if no replacement time is present, the exception says skip
 
 public:
   AlarmException() {};
   AlarmException(date_t date) : _date(date) {};
-  AlarmException(date_t date, alarm_time_t replacement_time) : _date(date), replacement_time(replacement_time) {};
+  AlarmException(date_t date, time_of_day_minutes_t replacement_time) : _date(date), replacement_time(replacement_time) {};
 
   date_t date() const {
     return _date;
@@ -42,7 +41,7 @@ public:
     return !replacement_time;
   }
 
-  optional<alarm_time_t> time() const {
+  optional<time_of_day_minutes_t> time() const {
     return replacement_time;
   }
 };
@@ -61,7 +60,7 @@ public:
 
   static const int EXCEPTIONS=10;
 
-  alarm_time_t time;
+  time_of_day_minutes_t time;
   uint8_t weekdays;
   optional<date_t> first_day;
   optional<date_t> last_day;
@@ -70,8 +69,11 @@ public:
   std::array<AlarmException, EXCEPTIONS> exceptions;
 
   Alarm();
-  optional<time_point_t> nextOccurrence(time_point_t t) const;
+  optional<time_point_secs_t> nextOccurrence(time_point_secs_t t) const;
   void addException(const AlarmException &e);
+  bool onWeekday(weekday wd) const {
+    return (weekdays & (1 << unsigned(wd))) != 0;
+  }
 
   std::string toString() const;
 };

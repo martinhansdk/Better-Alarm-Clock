@@ -21,13 +21,36 @@ void Alarm::addException(const AlarmException& e) {
   }
 }
 
-optional<time_point_t> Alarm::nextOccurrence(time_point_t t) const {
+optional<time_point_secs_t> Alarm::nextOccurrence(time_point_secs_t t) const {
   t += 1s; // advance to next instant after t
   // find first time point at or after t with
-  auto date = date::floor<date::days>(t);
-  auto time = date::make_time(t - date);
+  sys_days date = date::floor<date::days>(t);
+  auto timepart = t - date;
+  auto alarmtime = time.to_duration();
 
- return {};
+  if(timepart > alarmtime) {
+      date += days(1);
+  }
+
+  if(first_day && date < first_day.value())
+    date = first_day.value(); // fast forward to first_day
+
+  // naively search for a day that is not excluded somehow
+  int tries = 366;
+  while(tries--) {
+      date += days(1);
+      if(date > last_day)
+	break; // past the last day - won't find anything
+
+      weekday wd = weekday{date};
+      if(!onWeekday(wd)) continue;
+
+      // found a match!
+      return date + alarmtime;
+  }
+
+  // no match found :-(
+  return {};
 }
 
 std::string Alarm::toString() const {
@@ -65,7 +88,7 @@ std::string Alarm::toString() const {
 }
 
 //Simple population of the exclusion set
-bool isNear(time_point_t t, time_point_t now)
+bool isNear(time_point_secs_t t, time_point_secs_t now)
 {
 	const auto halfrange = seconds(5);
 	auto start_time = t - halfrange;
@@ -83,8 +106,8 @@ extern "C"
 
 
 
-    time_point_t now = day + 1h+2min+seconds(secs);
-    time_point_t alarm = day + 1h+2min+10s;
+    time_point_secs_t now = day + 1h+2min+seconds(secs);
+    time_point_secs_t alarm = day + 1h+2min+10s;
 
     return isNear(alarm, now);
     return true;

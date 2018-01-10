@@ -23,7 +23,7 @@ Alarm parseAlarm(const char *str )
 	const int INTS = 3;
 	int intvals[INTS] = { };
 	date_t day;
-	alarm_time_t time;
+	time_of_day_minutes_t time;
 
 	%%{
 		action int_add_digit { 
@@ -50,7 +50,7 @@ Alarm parseAlarm(const char *str )
 		}
 
 		action save_time {
-			time = alarm_time_t(minutes(intvals[1]*60+intvals[0]));
+			time = time_of_day_minutes_t(minutes(intvals[1]*60+intvals[0]));
 		}
 
 		action save_date {
