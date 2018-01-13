@@ -38,15 +38,27 @@ optional<time_point_secs_t> Alarm::nextOccurrence(time_point_secs_t t) const {
   // naively search for a day that is not excluded somehow
   int tries = 366;
   while(tries--) {
-      date += days(1);
-      if(date > last_day)
+      if(last_day && date > last_day.value())
 	break; // past the last day - won't find anything
 
       weekday wd = weekday{date};
-      if(!onWeekday(wd)) continue;
+      if(!onWeekday(wd)) goto next_day;
+
+      for(int i=0 ; i < no_exceptions ; i++) {
+	  if(date == exceptions[i].date()) {
+	      if(exceptions[i].skip()) {
+		  goto next_day;
+	      } else {
+		  alarmtime = exceptions[i].time().to_duration();
+	      }
+	  }
+      }
 
       // found a match!
       return date + alarmtime;
+
+      next_day:
+      date += days(1);
   }
 
   // no match found :-(
@@ -78,7 +90,7 @@ std::string Alarm::toString() const {
       if(exceptions[i].skip()) {
 	  ss << " skip";
       } else {
-	  ss << " " << exceptions[i].time().value();
+	  ss << " " << exceptions[i].time();
       }
 
   }

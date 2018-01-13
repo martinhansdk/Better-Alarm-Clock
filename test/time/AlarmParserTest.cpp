@@ -63,15 +63,22 @@ TEST_CASE( "Alarm is parsed", "[alarm,io]") {
 
 #define SET_START_TIME_AND_ALARM(start_day, start_time, alarm_string)         \
 		time_point_secs_t t = sys_days(start_day) + start_time; \
-		Alarm alarm = parseAlarm(alarm_string);
+		Alarm alarm = parseAlarm(alarm_string); \
+		optional<time_point_secs_t> n = t; \
+		time_point_secs_t exp;
 
 
 #define SET_START_DAY_AND_ALARM(start_day, alarm_string)    SET_START_TIME_AND_ALARM(start_day, 0h, alarm_string)
 
 #define CHECK_FIRST_OCCURRENCE(from_midnight)        \
-		auto n=alarm.nextOccurrence(t);      \
+		n=alarm.nextOccurrence(t);      \
 		time_point_secs_t midnight = floor<days>(t); \
-		time_point_secs_t exp=midnight+from_midnight;    \
+		exp=midnight+from_midnight;    \
+		CHECK(n == exp);
+
+#define CHECK_NEXT_OCCURRENCE_AT(alarm_day, alarm_time)        \
+		n=alarm.nextOccurrence(t);      \
+		exp=sys_days(alarm_day)+alarm_time;    \
 		CHECK(n == exp);
 
 #define CHECK_NEXT_OCCURRENCE_DIST(gap) \
@@ -79,7 +86,13 @@ TEST_CASE( "Alarm is parsed", "[alarm,io]") {
 		n=alarm.nextOccurrence(n.value()); \
 		CHECK(n == exp);
 
+#define CHECK_NO_MORE_OCCURRENCES \
+                n=alarm.nextOccurrence(n.value()); \
+                CHECK(n == empty);
+
+
 TEST_CASE("Alarm finds next time", "[alarm]") {
+  const optional<time_point_secs_t> empty = {};
 
   SECTION("for a daily alarm") {
     SET_START_DAY_AND_ALARM(2018_y/1/1, "alarm 06:15;");
@@ -108,4 +121,48 @@ TEST_CASE("Alarm finds next time", "[alarm]") {
     }
   }
 
+
+  SECTION("for a bi-weekly alarm") {
+    SET_START_DAY_AND_ALARM(2018_y/1/1, "alarm 17:59 every sat sun;");
+
+    CHECK_FIRST_OCCURRENCE(5*24h+17h+59min);
+    for (int i=0; i<15; ++i) {
+	CHECK_NEXT_OCCURRENCE_DIST(24h);
+	CHECK_NEXT_OCCURRENCE_DIST(6*24h);
+    }
+  }
+
+  SECTION("for an expired alarm") {
+    SET_START_DAY_AND_ALARM(2018_y/1/1, "alarm 17:59 until 2017-12-31;");
+
+    CHECK_NO_MORE_OCCURRENCES;
+  }
+
+
+  SECTION("for a single day alarm") {
+    SET_START_DAY_AND_ALARM(2018_y/1/1, "alarm 17:59 from 2018-10-10 until 2018-10-10;");
+
+    CHECK_NEXT_OCCURRENCE_AT(2018_y/10/10, 17h+59min);
+    CHECK_NO_MORE_OCCURRENCES;
+  }
+
+  SECTION("for an alarm with start and end time") {
+    SET_START_DAY_AND_ALARM(2018_y/1/1, "alarm 17:59 from 2018-10-10 until 2018-10-11;");
+
+    CHECK_NEXT_OCCURRENCE_AT(2018_y/10/10, 17h+59min);
+    CHECK_NEXT_OCCURRENCE_DIST(24h);
+    CHECK_NO_MORE_OCCURRENCES;
+  }
+
+  SECTION("for an alarm with a skip exception") {
+    SET_START_DAY_AND_ALARM(2018_y/1/1, "alarm 06:15 from 2018-05-08 until 2018-10-13 but on 2018-05-10 skip;");
+
+    CHECK_NEXT_OCCURRENCE_AT(2018_y/5/8, 6h+15min);
+    CHECK_NEXT_OCCURRENCE_DIST(24h);
+    CHECK_NEXT_OCCURRENCE_DIST(48h);
+    CHECK_NEXT_OCCURRENCE_DIST(24h);
+    CHECK_NEXT_OCCURRENCE_DIST(24h);
+    CHECK_NEXT_OCCURRENCE_DIST(24h);
+    CHECK_NO_MORE_OCCURRENCES;
+  }
 }

@@ -41,8 +41,8 @@ public:
     return !replacement_time;
   }
 
-  optional<time_of_day_minutes_t> time() const {
-    return replacement_time;
+  time_of_day_minutes_t time() const {
+    return replacement_time.value();
   }
 };
 
