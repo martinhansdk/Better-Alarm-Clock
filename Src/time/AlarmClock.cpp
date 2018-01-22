@@ -4,9 +4,10 @@
  *  Created on: Dec 30, 2017
  *      Author: Hans
  */
+#include "AlarmClock.hpp"
+
 #include <sstream>
 
-#include "AlarmClock.h"
 
 const char * const wdnames[] = {"sun", "mon", "tue", "wed", "thu", "fri", "sat" };
 

@@ -8,7 +8,7 @@
 #ifndef TIME_ALARMPARSER_H_
 #define TIME_ALARMPARSER_H_
 
-#include "AlarmClock.h"
+#include "AlarmClock.hpp"
 
 extern Alarm parseAlarm(const char *str );
 
