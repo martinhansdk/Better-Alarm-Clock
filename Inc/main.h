@@ -9,7 +9,7 @@
   * inserted by the user or by software development tools
   * are owned by their respective copyright owners.
   *
-  * Copyright (c) 2017 STMicroelectronics International N.V. 
+  * Copyright (c) 2018 STMicroelectronics International N.V. 
   * All rights reserved.
   *
   * Redistribution and use in source and binary forms, with or without 
@@ -56,6 +56,17 @@
 /* USER CODE END Includes */
 
 /* Private define ------------------------------------------------------------*/
+
+#define LED_Pin GPIO_PIN_5
+#define LED_GPIO_Port GPIOA
+#define DC_Pin GPIO_PIN_7
+#define DC_GPIO_Port GPIOC
+#define SW_MOSI_Pin GPIO_PIN_8
+#define SW_MOSI_GPIO_Port GPIOA
+#define SW_SCK_Pin GPIO_PIN_9
+#define SW_SCK_GPIO_Port GPIOA
+#define CS_Pin GPIO_PIN_6
+#define CS_GPIO_Port GPIOB
 
 /* ########################## Assert Selection ############################## */
 /**
