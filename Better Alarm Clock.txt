@@ -1,6 +1,6 @@
 Configuration	Better Alarm Clock
 STM32CubeMX 	4.23.0
-Date	01/23/2018
+Date	01/26/2018
 MCU	STM32L073RZTx
 
 
@@ -11,6 +11,7 @@ RCC	Crystal/Ceramic Resonator	RCC_OSC32_OUT	PC15-OSC32_OUT
 RTC	Activate RTC Clock Source	RTC_VS_RTC_Activate	VP_RTC_VS_RTC_Activate
 RTC	RTC Enabled	RTC_VS_RTC_Calendar	VP_RTC_VS_RTC_Calendar
 RTC	Internal Alarm A	RTC_VS_RTC_Alarm_A_Intern	VP_RTC_VS_RTC_Alarm_A_Intern
+RTC	Internal Alarm B	RTC_VS_RTC_Alarm_B_Intern	VP_RTC_VS_RTC_Alarm_B_Intern
 SYS	Serial_Wire	SYS_SWCLK	PA14
 SYS	Serial_Wire	SYS_SWDIO	PA13
 SYS	TIM2	SYS_VS_tim2	VP_SYS_VS_tim2

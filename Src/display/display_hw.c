@@ -164,28 +164,5 @@ void initDisplay() {
 }
 
 
-void draw(u8g2_t *u8g2, RTC_HandleTypeDef *hrtc)
-{
-  RTC_TimeTypeDef time;
-  RTC_DateTypeDef date;
-  char buf[20];
 
-  u8g2_ClearBuffer(u8g2);
-
-  u8g2_SetFontMode(u8g2, 1);
-  u8g2_SetFontDirection(u8g2, 0);
-
-  u8g2_SetFont(u8g2, u8g2_font_ncenB14_tr);
-
-  if(HAL_RTC_GetTime(hrtc, &time, RTC_FORMAT_BIN) != HAL_OK)
-  {
-    _Error_Handler(__FILE__, __LINE__);
-  }
-  snprintf(&buf[0], sizeof(buf), "%d:%02d:%02d", time.Hours, time.Minutes, time.Seconds);
-  HAL_RTC_GetDate(hrtc, &date, RTC_FORMAT_BCD);
-
-  u8g2_DrawStr(u8g2, 0, 24, buf);
-
-  u8g2_SendBuffer(u8g2);
-}
 

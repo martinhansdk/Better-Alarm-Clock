@@ -54,6 +54,7 @@
 
 /* USER CODE BEGIN Includes */
 #include "display_hw.h"
+#include "application.h"
 
 /* USER CODE END Includes */
 
@@ -289,11 +290,21 @@ static void MX_RTC_Init(void)
   sAlarm.AlarmTime.SubSeconds = 0;
   sAlarm.AlarmTime.DayLightSaving = RTC_DAYLIGHTSAVING_NONE;
   sAlarm.AlarmTime.StoreOperation = RTC_STOREOPERATION_RESET;
-  sAlarm.AlarmMask = RTC_ALARMMASK_NONE;
+  sAlarm.AlarmMask = RTC_ALARMMASK_ALL;
   sAlarm.AlarmSubSecondMask = RTC_ALARMSUBSECONDMASK_ALL;
   sAlarm.AlarmDateWeekDaySel = RTC_ALARMDATEWEEKDAYSEL_DATE;
   sAlarm.AlarmDateWeekDay = 1;
   sAlarm.Alarm = RTC_ALARM_A;
+  if (HAL_RTC_SetAlarm_IT(&hrtc, &sAlarm, RTC_FORMAT_BIN) != HAL_OK)
+  {
+    _Error_Handler(__FILE__, __LINE__);
+  }
+
+    /**Enable the Alarm B 
+    */
+  sAlarm.AlarmMask = RTC_ALARMMASK_NONE;
+  sAlarm.AlarmDateWeekDay = 1;
+  sAlarm.Alarm = RTC_ALARM_B;
   if (HAL_RTC_SetAlarm_IT(&hrtc, &sAlarm, RTC_FORMAT_BIN) != HAL_OK)
   {
     _Error_Handler(__FILE__, __LINE__);
@@ -435,12 +446,7 @@ void soundTaskEntry(void const * argument)
 void guiTaskEntry(void const * argument)
 {
   /* USER CODE BEGIN guiTaskEntry */
-  /* Infinite loop */
-  for(;;)
-  {
-    osDelay(1);
-    draw(&display, &hrtc);
-  }
+  runGUITask();
   /* USER CODE END guiTaskEntry */
 }
 
