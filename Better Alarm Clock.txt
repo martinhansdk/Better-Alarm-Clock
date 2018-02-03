@@ -1,6 +1,6 @@
 Configuration	Better Alarm Clock
 STM32CubeMX 	4.23.0
-Date	01/26/2018
+Date	02/03/2018
 MCU	STM32L073RZTx
 
 

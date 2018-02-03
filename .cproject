@@ -67,10 +67,14 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Better-Alarm-Clock/Drivers/CMSIS/Include}&quot;" />
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Better-Alarm-Clock/Drivers/CMSIS/Device/ST/STM32L0xx/Include}&quot;" />
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Better-Alarm-Clock/Src/display}&quot;" />
+									<listOptionValue builtIn="false" value="../Middlewares/Third_Party/FreeRTOS/Source/include" />
+									<listOptionValue builtIn="false" value="../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS" />
+									<listOptionValue builtIn="false" value="../Middlewares/Third_Party/FatFs/src" />
+									<listOptionValue builtIn="false" value="../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM0" />
 								</option>
 								<option id="gnu.cpp.compiler.option.dialect.std.1380085100" name="Language standard" superClass="gnu.cpp.compiler.option.dialect.std" useByScannerDiscovery="true" value="gnu.cpp.compiler.dialect.c++1y" valueType="enumerated" />
 								<option id="fr.ac6.managedbuild.tool.gnu.cross.cpp.compiler.fdata.1503323515" name="Place the data in their own section (-fdata-sections)" superClass="fr.ac6.managedbuild.tool.gnu.cross.cpp.compiler.fdata" useByScannerDiscovery="false" value="true" valueType="boolean" />
-								<option id="gnu.cpp.compiler.option.preprocessor.def.549970587" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
+								<option id="gnu.cpp.compiler.option.preprocessor.def.549970587" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" useByScannerDiscovery="false" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="__packed=__attribute__((__packed__))" />
 									<listOptionValue builtIn="false" value="__weak=__attribute__((weak))" />
 									<listOptionValue builtIn="false" value="STM32L073xx" />
@@ -143,6 +147,10 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Better-Alarm-Clock/Drivers/CMSIS/Include}&quot;" />
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Better-Alarm-Clock/Drivers/CMSIS/Device/ST/STM32L0xx/Include}&quot;" />
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Better-Alarm-Clock/Src/display}&quot;" />
+									<listOptionValue builtIn="false" value="../Middlewares/Third_Party/FreeRTOS/Source/include" />
+									<listOptionValue builtIn="false" value="../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS" />
+									<listOptionValue builtIn="false" value="../Middlewares/Third_Party/FatFs/src" />
+									<listOptionValue builtIn="false" value="../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM0" />
 								</option>
 								<inputType id="fr.ac6.managedbuild.tool.gnu.cross.cpp.compiler.input.cpp.1682867254" superClass="fr.ac6.managedbuild.tool.gnu.cross.cpp.compiler.input.cpp" />
 								<inputType id="fr.ac6.managedbuild.tool.gnu.cross.cpp.compiler.input.s.1738519261" superClass="fr.ac6.managedbuild.tool.gnu.cross.cpp.compiler.input.s" />

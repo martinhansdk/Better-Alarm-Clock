@@ -62,8 +62,11 @@
 RTC_HandleTypeDef hrtc;
 
 osThreadId soundTaskHandle;
+uint32_t soundTaskBuffer[ 128 ];
+osStaticThreadDef_t soundTaskControlBlock;
 osThreadId guiTaskHandle;
-osThreadId timeKeepingTaskHandle;
+uint32_t guiTaskBuffer[ 1024 ];
+osStaticThreadDef_t guiTaskControlBlock;
 
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
@@ -76,7 +79,6 @@ static void MX_GPIO_Init(void);
 static void MX_RTC_Init(void);
 void soundTaskEntry(void const * argument);
 void guiTaskEntry(void const * argument);
-void timeKeepingTaskEntry(void const * argument);
 
 /* USER CODE BEGIN PFP */
 /* Private function prototypes -----------------------------------------------*/
@@ -132,16 +134,12 @@ int main(void)
 
   /* Create the thread(s) */
   /* definition and creation of soundTask */
-  osThreadDef(soundTask, soundTaskEntry, osPriorityRealtime, 0, 128);
+  osThreadStaticDef(soundTask, soundTaskEntry, osPriorityRealtime, 0, 128, soundTaskBuffer, &soundTaskControlBlock);
   soundTaskHandle = osThreadCreate(osThread(soundTask), NULL);
 
   /* definition and creation of guiTask */
-  osThreadDef(guiTask, guiTaskEntry, osPriorityNormal, 0, 128);
+  osThreadStaticDef(guiTask, guiTaskEntry, osPriorityNormal, 0, 1024, guiTaskBuffer, &guiTaskControlBlock);
   guiTaskHandle = osThreadCreate(osThread(guiTask), NULL);
-
-  /* definition and creation of timeKeepingTask */
-  osThreadDef(timeKeepingTask, timeKeepingTaskEntry, osPriorityIdle, 0, 128);
-  timeKeepingTaskHandle = osThreadCreate(osThread(timeKeepingTask), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -423,6 +421,45 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+/**
+  * @brief  Pre Sleep Processing
+  * @param  ulExpectedIdleTime: Expected time in idle state
+  * @retval None
+  */
+void PreSleepProcessing(uint32_t * ulExpectedIdleTime)
+{
+  /* Called by the kernel before it places the MCU into a sleep mode because
+  configPRE_SLEEP_PROCESSING() is #defined to PreSleepProcessing().
+
+  NOTE:  Additional actions can be taken here to get the power consumption
+  even lower.  For example, peripherals can be turned off here, and then back
+  on again in the post sleep processing function.  For maximum power saving
+  ensure all unused pins are in their lowest power state. */
+
+  /*
+    (*ulExpectedIdleTime) is set to 0 to indicate that PreSleepProcessing contains
+    its own wait for interrupt or wait for event instruction and so the kernel vPortSuppressTicksAndSleep
+    function does not need to execute the wfi instruction
+  */
+  *ulExpectedIdleTime = 0;
+
+  /*Enter to sleep Mode using the HAL function HAL_PWR_EnterSLEEPMode with WFI instruction*/
+  HAL_PWR_EnterSLEEPMode(PWR_MAINREGULATOR_ON, PWR_SLEEPENTRY_WFI);
+}
+
+/**
+  * @brief  Post Sleep Processing
+  * @param  ulExpectedIdleTime: Not used
+  * @retval None
+  */
+void PostSleepProcessing(uint32_t * ulExpectedIdleTime)
+{
+  /* Called by the kernel when the MCU exits a sleep mode because
+  configPOST_SLEEP_PROCESSING is #defined to PostSleepProcessing(). */
+
+  /* Avoid compiler warnings about the unused parameter. */
+  (void) ulExpectedIdleTime;
+}
 
 /* USER CODE END 4 */
 
@@ -437,7 +474,6 @@ void soundTaskEntry(void const * argument)
   for(;;)
   {
     osDelay(1000);
-    HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
   }
   /* USER CODE END 5 */ 
 }
@@ -448,18 +484,6 @@ void guiTaskEntry(void const * argument)
   /* USER CODE BEGIN guiTaskEntry */
   runGUITask();
   /* USER CODE END guiTaskEntry */
-}
-
-/* timeKeepingTaskEntry function */
-void timeKeepingTaskEntry(void const * argument)
-{
-  /* USER CODE BEGIN timeKeepingTaskEntry */
-  /* Infinite loop */
-  for(;;)
-  {
-    osDelay(1);
-  }
-  /* USER CODE END timeKeepingTaskEntry */
 }
 
 /**

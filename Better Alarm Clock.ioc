@@ -1,8 +1,17 @@
 #MicroXplorer Configuration settings - do not modify
 FREERTOS.FootprintOK=true
-FREERTOS.IPParameters=Tasks01,configUSE_TICKLESS_IDLE,FootprintOK
-FREERTOS.Tasks01=soundTask,3,128,soundTaskEntry,Default,NULL,Dynamic,NULL,NULL;guiTask,0,128,guiTaskEntry,Default,NULL,Dynamic,NULL,NULL;timeKeepingTask,-3,128,timeKeepingTaskEntry,Default,NULL,Dynamic,NULL,NULL
+FREERTOS.INCLUDE_uxTaskGetStackHighWaterMark=1
+FREERTOS.INCLUDE_xEventGroupSetBitFromISR=1
+FREERTOS.INCLUDE_xTimerPendFunctionCall=1
+FREERTOS.IPParameters=Tasks01,configUSE_TICKLESS_IDLE,FootprintOK,configUSE_PREEMPTION,configENABLE_BACKWARD_COMPATIBILITY,configUSE_TASK_NOTIFICATIONS,MEMORY_ALLOCATION,configUSE_TIMERS,INCLUDE_xTimerPendFunctionCall,INCLUDE_xEventGroupSetBitFromISR,INCLUDE_uxTaskGetStackHighWaterMark,configCHECK_FOR_STACK_OVERFLOW
+FREERTOS.MEMORY_ALLOCATION=1
+FREERTOS.Tasks01=soundTask,3,128,soundTaskEntry,Default,NULL,Static,soundTaskBuffer,soundTaskControlBlock;guiTask,0,1024,guiTaskEntry,Default,NULL,Static,guiTaskBuffer,guiTaskControlBlock
+FREERTOS.configCHECK_FOR_STACK_OVERFLOW=2
+FREERTOS.configENABLE_BACKWARD_COMPATIBILITY=0
+FREERTOS.configUSE_PREEMPTION=0
+FREERTOS.configUSE_TASK_NOTIFICATIONS=0
 FREERTOS.configUSE_TICKLESS_IDLE=1
+FREERTOS.configUSE_TIMERS=1
 File.Version=6
 KeepUserPlacement=false
 Mcu.Family=STM32L0
