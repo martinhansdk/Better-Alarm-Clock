@@ -57,8 +57,16 @@
 
 /* Private define ------------------------------------------------------------*/
 
+#define SD_MISO_Pin GPIO_PIN_2
+#define SD_MISO_GPIO_Port GPIOC
+#define SD_MOSI_Pin GPIO_PIN_3
+#define SD_MOSI_GPIO_Port GPIOC
 #define LED_Pin GPIO_PIN_5
 #define LED_GPIO_Port GPIOA
+#define SD_CS_Pin GPIO_PIN_0
+#define SD_CS_GPIO_Port GPIOB
+#define SD_SCK_Pin GPIO_PIN_10
+#define SD_SCK_GPIO_Port GPIOB
 #define DC_Pin GPIO_PIN_7
 #define DC_GPIO_Port GPIOC
 #define SW_MOSI_Pin GPIO_PIN_8

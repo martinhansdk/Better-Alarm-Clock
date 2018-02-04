@@ -63,6 +63,8 @@
 /* Private variables ---------------------------------------------------------*/
 RTC_HandleTypeDef hrtc;
 
+SPI_HandleTypeDef hspi2;
+
 osThreadId soundTaskHandle;
 uint32_t soundTaskBuffer[ 128 ];
 osStaticThreadDef_t soundTaskControlBlock;
@@ -79,6 +81,7 @@ osStaticThreadDef_t guiTaskControlBlock;
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_RTC_Init(void);
+static void MX_SPI2_Init(void);
 void soundTaskEntry(void const * argument);
 void guiTaskEntry(void const * argument);
 
@@ -120,6 +123,7 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_RTC_Init();
+  MX_SPI2_Init();
 
   /* USER CODE BEGIN 2 */
   initDisplay();
@@ -315,6 +319,30 @@ static void MX_RTC_Init(void)
 
 }
 
+/* SPI2 init function */
+static void MX_SPI2_Init(void)
+{
+
+  /* SPI2 parameter configuration*/
+  hspi2.Instance = SPI2;
+  hspi2.Init.Mode = SPI_MODE_MASTER;
+  hspi2.Init.Direction = SPI_DIRECTION_2LINES;
+  hspi2.Init.DataSize = SPI_DATASIZE_8BIT;
+  hspi2.Init.CLKPolarity = SPI_POLARITY_LOW;
+  hspi2.Init.CLKPhase = SPI_PHASE_1EDGE;
+  hspi2.Init.NSS = SPI_NSS_SOFT;
+  hspi2.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_2;
+  hspi2.Init.FirstBit = SPI_FIRSTBIT_MSB;
+  hspi2.Init.TIMode = SPI_TIMODE_DISABLE;
+  hspi2.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
+  hspi2.Init.CRCPolynomial = 7;
+  if (HAL_SPI_Init(&hspi2) != HAL_OK)
+  {
+    _Error_Handler(__FILE__, __LINE__);
+  }
+
+}
+
 /** Configure pins as 
         * Analog 
         * Input 
@@ -340,17 +368,17 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(GPIOA, LED_Pin|SW_MOSI_Pin|SW_SCK_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(DC_GPIO_Port, DC_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOB, SD_CS_Pin|CS_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(CS_GPIO_Port, CS_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(DC_GPIO_Port, DC_Pin, GPIO_PIN_RESET);
 
-  /*Configure GPIO pins : PC13 PC0 PC1 PC2 
-                           PC3 PC5 PC6 PC8 
-                           PC9 PC10 PC11 PC12 */
-  GPIO_InitStruct.Pin = GPIO_PIN_13|GPIO_PIN_0|GPIO_PIN_1|GPIO_PIN_2 
-                          |GPIO_PIN_3|GPIO_PIN_5|GPIO_PIN_6|GPIO_PIN_8 
-                          |GPIO_PIN_9|GPIO_PIN_10|GPIO_PIN_11|GPIO_PIN_12;
+  /*Configure GPIO pins : PC13 PC0 PC1 PC5 
+                           PC6 PC8 PC9 PC10 
+                           PC11 PC12 */
+  GPIO_InitStruct.Pin = GPIO_PIN_13|GPIO_PIN_0|GPIO_PIN_1|GPIO_PIN_5 
+                          |GPIO_PIN_6|GPIO_PIN_8|GPIO_PIN_9|GPIO_PIN_10 
+                          |GPIO_PIN_11|GPIO_PIN_12;
   GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
@@ -384,14 +412,21 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : PB0 PB1 PB2 PB10 
-                           PB11 PB12 PB13 PB14 
-                           PB15 PB3 PB4 PB5 
-                           PB7 PB8 PB9 */
-  GPIO_InitStruct.Pin = GPIO_PIN_0|GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_10 
-                          |GPIO_PIN_11|GPIO_PIN_12|GPIO_PIN_13|GPIO_PIN_14 
-                          |GPIO_PIN_15|GPIO_PIN_3|GPIO_PIN_4|GPIO_PIN_5 
-                          |GPIO_PIN_7|GPIO_PIN_8|GPIO_PIN_9;
+  /*Configure GPIO pins : SD_CS_Pin CS_Pin */
+  GPIO_InitStruct.Pin = SD_CS_Pin|CS_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : PB1 PB2 PB11 PB12 
+                           PB13 PB14 PB15 PB3 
+                           PB4 PB5 PB7 PB8 
+                           PB9 */
+  GPIO_InitStruct.Pin = GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_11|GPIO_PIN_12 
+                          |GPIO_PIN_13|GPIO_PIN_14|GPIO_PIN_15|GPIO_PIN_3 
+                          |GPIO_PIN_4|GPIO_PIN_5|GPIO_PIN_7|GPIO_PIN_8 
+                          |GPIO_PIN_9;
   GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
@@ -415,13 +450,6 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
-
-  /*Configure GPIO pin : CS_Pin */
-  GPIO_InitStruct.Pin = CS_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(CS_GPIO_Port, &GPIO_InitStruct);
 
 }
 
@@ -471,16 +499,83 @@ void PostSleepProcessing(uint32_t * ulExpectedIdleTime)
 /* soundTaskEntry function */
 void soundTaskEntry(void const * argument)
 {
+  FRESULT res;                                          /* FatFs function common result code */
+  uint32_t byteswritten, bytesread;                     /* File write/read counts */
+  uint8_t wtext[] = "This is STM32 working with FatFs"; /* File write buffer */
+  uint8_t rtext[100];                                   /* File read buffer */
+
   /* init code for FATFS */
   MX_FATFS_Init();
+
+  /*## Create and Open a new text file object with write access #######*/
+  if(f_open(&USERFile, "STM32.TXT", FA_CREATE_ALWAYS | FA_WRITE) != FR_OK)
+    {
+      /* 'STM32.TXT' file Open for write Error */
+      Error_Handler();
+    }
+  else
+    {
+      /*##-4- Write data to the text file ##################################*/
+      res = f_write(&USERFile, wtext, sizeof(wtext), (void *)&byteswritten);
+
+      if((byteswritten == 0) || (res != FR_OK))
+	{
+	  /* 'STM32.TXT' file Write or EOF Error */
+	  Error_Handler();
+	}
+      else
+	{
+	  /*##-5- Close the open text file ###################################*/
+	  f_close(&USERFile);
+
+	  /*##-6- Open the text file object with read access #################*/
+	  if(f_open(&USERFile, "STM32.TXT", FA_READ) != FR_OK)
+	    {
+	      /* 'STM32.TXT' file Open for read Error */
+	      Error_Handler();
+	    }
+	  else
+	    {
+	      /*##-7- Read data from the text file #############################*/
+	      res = f_read(&USERFile, rtext, sizeof(rtext), (UINT*)&bytesread);
+
+	      if((bytesread == 0) || (res != FR_OK))
+		{
+		  /* 'STM32.TXT' file Read or EOF Error */
+		  Error_Handler();
+		}
+	      else
+		{
+		  /*##-8- Close the open text file ###############################*/
+		  f_close(&USERFile);
+
+		  /*##-9- Compare read data with the expected data ###############*/
+		  if((bytesread != byteswritten))
+		    {
+		      /* Read data is different from the expected data */
+		      Error_Handler();
+		    }
+		  else
+		    {
+		      /* Success of the demo: no error occurrence */
+
+		    }
+		}
+	    }
+	}
+    }
+
+
+  /*##-10- Unlink the SD disk I/O driver #####################################*/
+  //FATFS_UnLinkDriver(SDPath);
 
   /* USER CODE BEGIN 5 */
   /* Infinite loop */
   for(;;)
-  {
-    printf("In the sound task...\n");
-    osDelay(1000);
-  }
+    {
+      printf("In the sound task...\n");
+      osDelay(1000);
+    }
   /* USER CODE END 5 */ 
 }
 

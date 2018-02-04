@@ -63,7 +63,17 @@ void MX_FATFS_Init(void)
   retUSER = FATFS_LinkDriver(&USER_Driver, USERPath);
 
   /* USER CODE BEGIN Init */
-  /* additional user code for init */     
+  /*##-1- Link the micro SD disk I/O driver ##################################*/
+  if(retUSER != 0)
+  {
+      Error_Handler();
+  } else
+    /*##-2- Register the file system object to the FatFs module ##############*/
+    if(f_mount(&USERFatFS, (TCHAR const*)USERPath, 0) != FR_OK)
+    {
+      /* FatFs Initialization Error */
+      Error_Handler();
+    }
   /* USER CODE END Init */
 }
 
