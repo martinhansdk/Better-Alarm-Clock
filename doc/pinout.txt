@@ -1,0 +1,11 @@
+
+
+* SD card
+attached to SPI1
+E13 : SD_SCK
+E14 : SD_MISO
+E15 : SD_MOSI
+H9 : SD_MOSI_DIR
+ 
+D0 : SD_CS
+

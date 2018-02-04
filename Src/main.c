@@ -55,6 +55,8 @@
 /* USER CODE BEGIN Includes */
 #include "display_hw.h"
 #include "application.h"
+#include <stdio.h>	/*rtt*/
+#include <stdlib.h>	/*rtt*/
 
 /* USER CODE END Includes */
 
@@ -82,7 +84,7 @@ void guiTaskEntry(void const * argument);
 
 /* USER CODE BEGIN PFP */
 /* Private function prototypes -----------------------------------------------*/
-
+extern void initialise_monitor_handles(void);	/*rtt*/
 /* USER CODE END PFP */
 
 /* USER CODE BEGIN 0 */
@@ -93,6 +95,9 @@ int main(void)
 {
 
   /* USER CODE BEGIN 1 */
+  initialise_monitor_handles();
+
+  puts("ARM semihosting enabled.");
 
   /* USER CODE END 1 */
 
@@ -473,6 +478,7 @@ void soundTaskEntry(void const * argument)
   /* Infinite loop */
   for(;;)
   {
+    printf("In the sound task...\n");
     osDelay(1000);
   }
   /* USER CODE END 5 */ 
